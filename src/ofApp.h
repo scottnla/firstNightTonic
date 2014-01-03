@@ -26,10 +26,7 @@ class ofApp : public ofBaseApp, public ControlChangeSubscriber{
     
     void audioRequested (float * output, int bufferSize, int nChannels);
   
-    // implementation of me
+    // implementation of virtual method in ControlChangeSubscriber
     void valueChanged(string, TonicFloat);
   
-  
-    ofColor bgColor;
-		
 };

@@ -195,18 +195,21 @@ void ofApp::setup(){
 
 void ofApp::valueChanged(string name, TonicFloat value){
   if(name == "padsTrigger"){
-    bgColor = ofColor(rand() % 255, rand() % 255, rand() % 255);
+    ofSetColor(255, 255, 255);
+    float squareSize = 40;
+    ofRect(ofGetWindowWidth() / 2 - squareSize / 2, ofGetWindowHeight() / 2 - squareSize / 2, squareSize, squareSize);
   }
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
-  synth.sendControlChangesToSubscribers();
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-  ofClear(bgColor);
+  ofClear(0,0,0);
+  // this will cause the synth to call valueChanged if there are value changes to report
+  synth.sendControlChangesToSubscribers();
 }
 
 //--------------------------------------------------------------
@@ -222,7 +225,7 @@ void ofApp::keyReleased(int key){
 //--------------------------------------------------------------
 void ofApp::mouseMoved(int x, int y ){
   synth.setParameter("x", (float)x / ofGetWindowWidth());
-  synth.setParameter("y", (float)y / ofGetWindowHeight());
+  synth.setParameter("y", 1.0 - (float)y / ofGetWindowHeight());
 }
 
 //--------------------------------------------------------------
