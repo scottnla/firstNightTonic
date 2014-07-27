@@ -1,9 +1,14 @@
 #pragma once
 
 #include "ofMain.h"
+#include "ofxTonic.h"
 
-class ofApp : public ofBaseApp{
+using namespace Tonic;
 
+class ofApp : public ofBaseApp, public ControlChangeSubscriber{
+
+
+  Synth synth;
 	public:
 		void setup();
 		void update();
@@ -18,5 +23,10 @@ class ofApp : public ofBaseApp{
 		void windowResized(int w, int h);
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
-		
+    
+    void audioRequested (float * output, int bufferSize, int nChannels);
+  
+    // implementation of virtual method in ControlChangeSubscriber
+    void valueChanged(string, TonicFloat);
+  
 };
