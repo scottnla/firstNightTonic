@@ -1,0 +1,44 @@
+uniform float time;
+uniform vec2 resolution;
+uniform bool bVert, bHorizon, bDiag, bDiagAlt, bArms, bRings, bSpiral, bSpiralAlt;
+uniform float sVert, sHorizon, sDiag, sDiagAlt, sArms, sRings, sSpiral, sSpiralAlt;
+uniform float vertPeriod, horizonPeriod, diagPeriod, diagAltPeriod, armPeriod, ringPeriod, spiralPeriod, spiralAltPeriod;
+uniform float numVert, numHorizon, numDiag, numDiagAlt, numRings, numArms, numSpiral, numSpiralAlt;
+
+void main( void ) {
+    vec2 position = (gl_FragCoord.xy/resolution.xy);
+
+    float cX = position.x - 0.5;
+    float cY = position.y - 0.5;
+    
+    float newX = log(sqrt(cX*cX + cY*cY)) / log(sqrt(2.0)); //normalized
+    float newY = atan(cX, cY) / atan(1.0, 1.0); //normalized
+     
+    float PI = 3.14159;
+    float spiralAngle = PI/3.0;
+    float spiralAngleAlt = 2.0*PI - PI/3.0;
+    
+    float color = 0.0;
+    
+    //Vertical Bands
+        color += sVert * cos(2.0*PI*numVert*(cY + vertPeriod*time));
+    //Horizontal Bands
+        color += sHorizon * cos(2.0*PI*numHorizon*(cX + horizonPeriod*time));
+    //Diagonal Bands
+        color += sDiag * (cos(2.0*numDiag*(cX*sin(spiralAngle) + cY*cos(spiralAngle)) + diagPeriod*time));
+    //Perpendicular Diagonal bands
+        color += sDiagAlt * (cos(2.0*numDiagAlt*(cX*sin(spiralAngleAlt) + cY*cos(spiralAngleAlt)) + diagAltPeriod*time));
+    //Arms
+        color += sArms * cos(numArms*newY + time / armPeriod);
+    //Rings
+        color += sRings * cos(2.0*PI*(newX / numRings + time / ringPeriod));
+    //Spirals
+        color += sSpiral * (cos(2.0*PI*(newX*sin(spiralAngle) / numSpiral + newY*cos(spiralAngle) / numSpiral) + time / spiralPeriod));
+    //Alt Spirals
+        color += sSpiralAlt * (cos(2.0*numSpiralAlt*(newX*sin(spiralAngleAlt) + newY*cos(spiralAngleAlt)) + spiralAltPeriod*time));
+    //overall brightness/color
+    //color *= cos(time/10.0);
+    gl_FragColor = vec4( vec3( sin( color + time / 3.0 ) * 0.75, color, sin( color + time / 3.0 ) * 0.75 ), 1.0 );
+    //gl_FragColor = vec4(1.0,0.0,0.0,1.0);
+
+}

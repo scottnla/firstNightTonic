@@ -2,11 +2,11 @@
 
 #include "ofMain.h"
 #include "ofxTonic.h"
-#include "tweenedValue.h"
 
 using namespace Tonic;
 
 class ofApp : public ofBaseApp, public ControlChangeSubscriber{
+
 
   Synth synth;
 	public:
@@ -23,16 +23,10 @@ class ofApp : public ofBaseApp, public ControlChangeSubscriber{
 		void windowResized(int w, int h);
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
-        void setUniforms();
     
-        void audioRequested (float * output, int bufferSize, int nChannels);
+    void audioRequested (float * output, int bufferSize, int nChannels);
   
-        // implementation of virtual method in ControlChangeSubscriber
-        void valueChanged(string, TonicFloat);
- private:
-    ofShader shader;
-    ofFbo fbo;
-    TweenedVariable* sSpiral;
-    TweenedVariable* numLines;
-    TweenedVariable* horzLines;
+    // implementation of virtual method in ControlChangeSubscriber
+    void valueChanged(string, TonicFloat);
+  
 };

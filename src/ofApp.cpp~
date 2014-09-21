@@ -2,23 +2,8 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-  ofEnableSmoothing();
-  ofSetFrameRate(60);
-  ofSetVerticalSync(true);
 
-  shader.load("cortex");
-  fbo.allocate(ofGetWidth(), ofGetHeight());
-  sSpiral = new TweenedVariable(0);
-  sSpiral->setTarget(0);
-  sSpiral->setDelta(0.25);
-    horzLines = new TweenedVariable(0.0);
-    horzLines->setTarget(0);
-    horzLines->setDelta(0.25);
-    numLines = new TweenedVariable(0.0);
-    numLines->setTarget(0.0);
-    numLines->setDelta(0.25);
-    
-    
+  
   ofSoundStreamSetup(2, 0, this, 44100, 256, 4);
 
   class TheSynth : public Synth{
@@ -166,7 +151,7 @@ void ofApp::setup(){
     padSeqInputs.push_back(1);
      
     ControlSwitcher padsSeq = ControlSwitcher().setFloatInputs(padSeqInputs);
-    ControlGenerator padsTrigger = ControlTriggerFilter().trigger(metro).sequence("1000|1000|1000|0010|");
+    ControlGenerator padsTrigger = ControlTriggerFilter().trigger(metro).sequence("1000|1011|1011|0010|");
     publishChanges(padsTrigger, "padsTrigger");
     publishChanges(ControlPulse().trigger(padsTrigger));
     Generator pads = padsAdder >> LPF24().cutoff(5000 * speedCalc + 500 + 1500 * ADSR(0.001, 0.1,0,0).trigger(padsTrigger) );
@@ -210,33 +195,21 @@ void ofApp::setup(){
 
 void ofApp::valueChanged(string name, TonicFloat value){
   if(name == "padsTrigger"){
-      sSpiral->setTarget(1.0);
+    ofSetColor(255, 255, 255);
+    float squareSize = 40;
+    ofRect(ofGetWindowWidth() / 2 - squareSize / 2, ofGetWindowHeight() / 2 - squareSize / 2, squareSize, squareSize);
   }
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
-    sSpiral->update();
-    if(sSpiral->getCurrentValue() == 1.0) {
-        sSpiral->setTarget(0.0);
-    }
-    numLines->update();
-    horzLines->update();
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-    
   ofClear(0,0,0);
   // this will cause the synth to call valueChanged if there are value changes to report
-    fbo.begin();
-    shader.begin();
-    setUniforms();
-    ofRect(0,0,ofGetWindowWidth(), ofGetWindowHeight());
-    shader.end();
-    fbo.end();
-    fbo.draw(0,0,ofGetWindowWidth(), ofGetWindowHeight());
-    synth.sendControlChangesToSubscribers();
+  synth.sendControlChangesToSubscribers();
 }
 
 //--------------------------------------------------------------
@@ -281,60 +254,10 @@ void ofApp::gotMessage(ofMessage msg){
 }
 
 //--------------------------------------------------------------
-void ofApp::dragEvent(ofDragInfo dragInfo){
+void ofApp::dragEvent(ofDragInfo dragInfo){ 
 
 }
 
-//--------------------------------------------------------------
 void ofApp::audioRequested (float * output, int bufferSize, int nChannels){
   synth.fillBufferOfFloats(output, bufferSize, nChannels);
-}
-
-//--------------------------------------------------------------
-void ofApp::setUniforms(){
-    float resolution[] = {ofGetWindowWidth(), ofGetWindowHeight()};
-    float time = 0.01*ofGetFrameNum();
-    
-    shader.setUniform1f("time",time);
-    shader.setUniform2fv("resolution",resolution);
-    
-    //flags for turning patterns on/off
-    shader.setUniform1i("bVert", true);
-    shader.setUniform1i("bHorizon", true);
-    shader.setUniform1i("bDiag", true);
-    shader.setUniform1i("bDiagAlt", true);
-    shader.setUniform1i("bArms", true);
-    shader.setUniform1i("bRings", true);
-    shader.setUniform1i("bSpiral", true);
-    shader.setUniform1i("bSpiralAlt", true);
-    
-    //scalars for tweening
-    shader.setUniform1f("sVert", sSpiral->getCurrentValue());
-    shader.setUniform1f("sHorizon", 0);
-    shader.setUniform1f("sDiag", 0);
-    shader.setUniform1f("sDiagAlt", 0);
-    shader.setUniform1f("sArms", 0.0);
-    shader.setUniform1f("sRings", 1.0);
-    shader.setUniform1f("sSpiral", 0.0);
-    shader.setUniform1f("sSpiralAlt", 0.0);
-    
-    //pattern periods
-    shader.setUniform1f("vertPeriod", 0.5);
-    shader.setUniform1f("horizonPeriod", 0.5);
-    shader.setUniform1f("diagPeriod", 0);
-    shader.setUniform1f("diagAltPeriod", 0);
-    shader.setUniform1f("armPeriod", 0.5);
-    shader.setUniform1f("ringPeriod", 0.5);
-    shader.setUniform1f("spiralPeriod", 0.75);
-    shader.setUniform1f("spiralAltPeriod", 24.0);
-    
-    //pattern parameters
-    shader.setUniform1f("numVert", 5);
-    shader.setUniform1f("numHorizon", 0);
-    shader.setUniform1f("numDiag", 0);
-    shader.setUniform1f("numDiagAlt", 0);
-    shader.setUniform1f("numArms", 5.0);
-    shader.setUniform1f("numRings", 1.0);
-    shader.setUniform1f("numSpiral", 3.0);
-    shader.setUniform1f("numSpiralAlt", 3.0);
 }
